@@ -1,5 +1,6 @@
 import {IUser} from "../models/models.js";
 import {users as data} from "../data/data.js";
+import {v4 as uuidv4} from 'uuid';
 
 export class UserController {
     async getUsers() {
@@ -25,8 +26,10 @@ export class UserController {
         return new Promise<IUser>((resolve, reject) => {
             let newUser = {
                 ...user,
-                id: String(Math.floor(4 + Math.random() * 10))
+                id: uuidv4()
             }
+            console.log(newUser)
+            data.push(newUser);
             resolve(newUser);
         })
     }
@@ -47,6 +50,9 @@ export class UserController {
             if (!user) {
                 reject(`No user with id ${id}`)
             }
+            data.forEach((elem, i) => {
+                if (elem.id == id) data.splice(i, 1)
+            })
             resolve('User deleted succefully' );
         })
     }
