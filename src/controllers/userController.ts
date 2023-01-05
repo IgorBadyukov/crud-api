@@ -1,4 +1,4 @@
-import {IUser} from "../models/models.js";
+import {IBody, IUser} from "../models/models.js";
 import {users as data} from "../data/data.js";
 import {v4 as uuidv4} from 'uuid';
 
@@ -28,19 +28,22 @@ export class UserController {
                 ...user,
                 id: uuidv4()
             }
-            console.log(newUser)
             data.push(newUser);
             resolve(newUser);
         })
     }
 
-    async updateUser(id: string) {
-        return new Promise<IUser>((resolve, reject) => {
+    async updateUser(id: string, body: IBody) {
+        return new Promise<string>((resolve, reject) => {
             let user = data.find(user => user.id === id);
             if (!user) {
                 reject(`No user with id ${id}`)
             }
-            //code for resolve;
+            for (let i = 0; i < data.length; i++) {
+                data[i] = data[i].id === id ? {...data[i], ...body} : data[i];
+            }
+            // user =  { ...user, ...body } as IUser;
+            resolve(`User ${id} successfully update`)
         })
     }
 

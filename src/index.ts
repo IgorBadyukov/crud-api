@@ -1,8 +1,7 @@
 import * as http from "http";
 import {UserController} from "./controllers/userController";
-import {v4 as uuidv4} from 'uuid';
 import {checkBodyReq, getReqData, uuidValidateV4} from "./models/utils";
-import {IUser} from "./models/models";
+import {IBody, IUser} from "./models/models";
 
 const PORT = Number(process.env.PORT) || 4000;
 
@@ -37,8 +36,8 @@ const myServer = http.createServer(async (req, res) => {
     //POST create new user
     else if (req.url?.match(/^(\/api\/users)\/?$/) && req.method === 'POST') {
         let bodyUser = await getReqData(req);
-        if (!checkBodyReq(bodyUser as object)) {
-            res.writeHead(404, {'Content-Type': 'application/json'});
+        if (checkBodyReq(bodyUser as object)) {
+            res.writeHead(400, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({message: "Error in body request"}))
         }
         else {
@@ -50,10 +49,27 @@ const myServer = http.createServer(async (req, res) => {
     }
     //PUT update user
     else if (req.url?.match(/^(\/api\/users)\/[0-9a-z-]+\/?$/) && req.method === 'PUT') {
-        let bodyUser = await getReqData(req);
-        if (!checkBodyReq(bodyUser as object)) {
-            res.writeHead(404, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: "Error in body request"}))
+        try {
+            const id = req.url?.split('/api/users/')[1] as string;
+            let bodyUser = await getReqData(req);
+            if (!uuidValidateV4(id)) {
+                res.writeHead(400, {'Content-Type': 'application/json'})
+                res.end(JSON.stringify({message: 'UserId is invalid'}));
+            }
+            else if (checkBodyReq(bodyUser as object)) {
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: "Error in body request"}))
+            } else {
+                let message = await new UserController().updateUser(id, JSON.parse(bodyUser as string) as IBody);
+                if (!message) {
+                    throw new Error('User doesnt exist!');
+                }
+                res.writeHead(200, {'Content-Type': 'application/json'})
+                res.end(JSON.stringify({message}));
+            }
+        } catch (error) {
+            res.writeHead(404, {'Content-Type': 'application/json'})
+            res.end(JSON.stringify({message: error}));
         }
     }
     //DELETE delete user
@@ -65,12 +81,12 @@ const myServer = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({message: 'UserId is invalid'}));
             }
             else {
-                let messange = await new UserController().deleteUser(id);
-                if (!messange) {
+                let message = await new UserController().deleteUser(id);
+                if (!message) {
                     throw new Error('User doesnt exist!');
                 }
-                res.writeHead(200, {'Content-Type': 'application/json'})
-                res.end(JSON.stringify({messange}));
+                res.writeHead(204, {'Content-Type': 'application/json'})
+                res.end(JSON.stringify({message}));
             }
         } catch (error) {
             res.writeHead(404, {'Content-Type': 'application/json'})
@@ -87,6 +103,3 @@ const myServer = http.createServer(async (req, res) => {
 myServer.listen(PORT, () => {
     console.log('Server is running on port 4000. Go to http://localhost:4000/api')
 });
-
-
-// myServer.close()
