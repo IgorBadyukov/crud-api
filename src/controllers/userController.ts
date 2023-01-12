@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IBody, IUser } from '../models/models.js';
-import { users as data } from '../data/data.js';
+import { IBody, IUser } from '../models/models';
+import { users as data } from '../data/data';
 
 export class UserController {
   static async getUsers() {
@@ -32,15 +32,15 @@ export class UserController {
   }
 
   static async updateUser(id: string, body: IBody) {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<IUser>((resolve, reject) => {
       const user = data.find((u) => u.id === id);
       if (!user) {
         reject(new Error(`User with id ${id} not found`));
       }
       for (let i = 0; i < data.length; i++) {
-        data[i] = data[i].id === id ? { ...data[i], ...body } : data[i];
+        data[i] = data[i].id === id ? { ...body, id: data[i].id } : data[i];
+        resolve(data[i]);
       }
-      resolve(`User ${id} successfully update`);
     });
   }
 
@@ -48,12 +48,12 @@ export class UserController {
     return new Promise<string>((resolve, reject) => {
       const user = data.find((u) => u.id === id);
       if (!user) {
-        reject(new Error(`User with id ${id} not found`));
+        reject(new Error('User doesn\'t exist!'));
       }
       data.forEach((elem, i) => {
         if (elem.id === id) data.splice(i, 1);
       });
-      resolve('User deleted succefully');
+      resolve('User deleted successfully');
     });
   }
 }
