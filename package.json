@@ -7,8 +7,7 @@
     "test": "jest --no-cache --detectOpenHandles",
     "start:dev": "nodemon src/index.ts",
     "start:prod": "webpack --mode=production && node dist/index.js",
-    "start:multi": "npm run start:prod -- --cluster",
-    "start:multidev": "npm run start:dev -- --cluster",
+    "start:multi": "nodemon src/indexMulti.ts",
     "lint": "npx eslint ./src",
     "lint:fix": "eslint --fix --ext .js,.ts ."
   },
