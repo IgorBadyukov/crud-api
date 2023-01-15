@@ -24,6 +24,6 @@ export function runServer(PORT: number) {
       res.end(JSON.stringify({ message: 'Server error' }));
     }
   }).listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}. Go to http://localhost:${PORT}/api`);
+    console.log(`Server is running on port ${PORT}. Go to http://localhost:${PORT}`);
   });
 }
