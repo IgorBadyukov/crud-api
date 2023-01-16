@@ -1,5 +1,7 @@
 import http from 'http';
-import {createUser, deleteUser, getUser, getUsers, updateUser} from "./middleware";
+import {
+  createUser, deleteUser, getUser, getUsers, updateUser,
+} from './middleware';
 
 export function runServer(PORT: number) {
   return http.createServer(async (req, res) => {
@@ -8,7 +10,7 @@ export function runServer(PORT: number) {
       if (req.url === '/api/users' && req.method === 'GET') {
         await getUsers(req, res);
       } else if (req.url?.match(/^(\/api\/users)\/[0-9a-z-]+\/?$/) && req.method === 'GET') { // GET user
-        await getUser(req, res)
+        await getUser(req, res);
       } else if (req.url?.match(/^(\/api\/users)\/?$/) && req.method === 'POST') { // POST create new user
         await createUser(req, res);
       } else if (req.url?.match(/^(\/api\/users)\/[0-9a-z-]+\/?$/) && req.method === 'PUT') { // PUT update user
